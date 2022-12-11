@@ -220,6 +220,7 @@ typedef void (^pushCompletion)(UIBackgroundFetchResult result);
         actionWithIdentifier:@"REPLY_ACTION"
         title:NSLocalizedString(@"Reply", @"")
         options:UNNotificationActionOptionNone
+        icon:[UNNotificationActionIcon iconWithSystemImageName:@"arrowshape.turn.up.left"] 
         textInputButtonTitle:NSLocalizedString(@"Send", @"")
         textInputPlaceholder:NSLocalizedString(@"Your answer", @"")
     ];
@@ -227,47 +228,21 @@ typedef void (^pushCompletion)(UIBackgroundFetchResult result);
         actionWithIdentifier:@"MARK_AS_READ_ACTION"
         title:NSLocalizedString(@"Mark as read", @"")
         options:UNNotificationActionOptionNone
+        icon:[UNNotificationActionIcon iconWithSystemImageName:@"checkmark.bubble"]
     ];
     UNNotificationAction* approveSubscriptionAction = [UNNotificationAction
         actionWithIdentifier:@"APPROVE_SUBSCRIPTION_ACTION"
         title:NSLocalizedString(@"Approve new contact", @"")
         options:UNNotificationActionOptionNone
+        icon:[UNNotificationActionIcon iconWithSystemImageName:@"person.crop.circle.badge.checkmark"]
     ];
     UNNotificationAction* denySubscriptionAction = [UNNotificationAction
         actionWithIdentifier:@"DENY_SUBSCRIPTION_ACTION"
         title:NSLocalizedString(@"Deny new contact", @"")
         options:UNNotificationActionOptionNone
+        icon:[UNNotificationActionIcon iconWithSystemImageName:@"person.crop.circle.badge.xmark"]
     ];
-    if(@available(iOS 15.0, macCatalyst 15.0, *))
-    {
-        replyAction = [UNTextInputNotificationAction
-            actionWithIdentifier:@"REPLY_ACTION"
-            title:NSLocalizedString(@"Reply", @"")
-            options:UNNotificationActionOptionNone
-            icon:[UNNotificationActionIcon iconWithSystemImageName:@"arrowshape.turn.up.left"] 
-            textInputButtonTitle:NSLocalizedString(@"Send", @"")
-            textInputPlaceholder:NSLocalizedString(@"Your answer", @"")
-        ];
-        markAsReadAction = [UNNotificationAction
-            actionWithIdentifier:@"MARK_AS_READ_ACTION"
-            title:NSLocalizedString(@"Mark as read", @"")
-            options:UNNotificationActionOptionNone
-            icon:[UNNotificationActionIcon iconWithSystemImageName:@"checkmark.bubble"]
-        ];
-        approveSubscriptionAction = [UNNotificationAction
-            actionWithIdentifier:@"APPROVE_SUBSCRIPTION_ACTION"
-            title:NSLocalizedString(@"Approve new contact", @"")
-            options:UNNotificationActionOptionNone
-            icon:[UNNotificationActionIcon iconWithSystemImageName:@"person.crop.circle.badge.checkmark"]
-        ];
-        denySubscriptionAction = [UNNotificationAction
-            actionWithIdentifier:@"DENY_SUBSCRIPTION_ACTION"
-            title:NSLocalizedString(@"Deny new contact", @"")
-            options:UNNotificationActionOptionNone
-            icon:[UNNotificationActionIcon iconWithSystemImageName:@"person.crop.circle.badge.xmark"]
-        ];
-    }
-    UNAuthorizationOptions authOptions = UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionAnnouncement | UNAuthorizationOptionProvidesAppNotificationSettings;
+    UNAuthorizationOptions authOptions = UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionProvidesAppNotificationSettings;
 #if TARGET_OS_MACCATALYST
     authOptions |= UNAuthorizationOptionProvisional;
 #endif
@@ -275,13 +250,13 @@ typedef void (^pushCompletion)(UIBackgroundFetchResult result);
         categoryWithIdentifier:@"message"
         actions:@[replyAction, markAsReadAction]
         intentIdentifiers:@[]
-        options:UNNotificationCategoryOptionAllowAnnouncement
+        options:UNNotificationCategoryOptionNone
     ];
     UNNotificationCategory* subscriptionCategory = [UNNotificationCategory
         categoryWithIdentifier:@"subscription"
         actions:@[approveSubscriptionAction, denySubscriptionAction]
         intentIdentifiers:@[]
-        options:UNNotificationCategoryOptionAllowAnnouncement
+        options:UNNotificationCategoryOptionCustomDismissAction
     ];
     
     [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
@@ -766,7 +741,7 @@ typedef void (^pushCompletion)(UIBackgroundFetchResult result);
             [self openChatOfContact:fromContact];
             
         }
-        else if([response.actionIdentifier isEqualToString:@"DENY_SUBSCRIPTION_ACTION"])
+        else if([response.actionIdentifier isEqualToString:@"DENY_SUBSCRIPTION_ACTION"] || [response.actionIdentifier isEqualToString:UNNotificationDismissActionIdentifier])
         {
             DDLogInfo(@"DENY_SUBSCRIPTION_ACTION triggered...");
             [[MLXMPPManager sharedInstance] rejectContact:fromContact];
