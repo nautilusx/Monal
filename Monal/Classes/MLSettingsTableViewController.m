@@ -321,12 +321,9 @@ enum DummySettingsRows {
         }
         case kSettingSectionApp: {
             switch(indexPath.row) {
-                    
-                case PrivacySettingsRow: {
-                    UIViewController* privacyViewController = [[SwiftuiInterface new] makeViewWithName:@"PrivacySettings"];
-                    [self showDetailViewController:privacyViewController sender:self];
+                case PrivacySettingsRow:
+                    [self performSegueWithIdentifier:@"showPrivacySettings" sender:self];
                     break;
-                }
                 case NotificationsRow: {
                     UIViewController* notificationSettingsController = [[SwiftuiInterface new] makeViewWithName:@"NotificationSettings"];
                     [self showDetailViewController:notificationSettingsController sender:self];

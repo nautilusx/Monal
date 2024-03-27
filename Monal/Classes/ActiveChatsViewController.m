@@ -484,8 +484,7 @@ static NSMutableSet* _smacksWarningDisplayed;
 
 -(void) showPrivacySettings
 {
-    UIViewController* ActiveprivacyViewController = [[SwiftuiInterface new] makeViewWithName:@"ActiveChatsPrivacySettings"];
-    [self showDetailViewController:ActiveprivacyViewController sender:self];
+    [self performSegueWithIdentifier:@"showPrivacySettings" sender:self];
 }
 
 -(void) showSettings
